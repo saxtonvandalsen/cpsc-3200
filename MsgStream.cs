@@ -9,48 +9,52 @@ namespace MsgStreamApp {
 
     public class MsgStream {
         private string[] messages;
-        private int maxCapacity;
+        private int capacity;
         private int operationCount;
-        private int messageCount;
         private int maxOperations;
+        private int messageCount;
 
-        public MsgStream(int capacity) {
+        public MsgStream(int capacity, int maxOperations) {
             messages = new string[capacity];
-            maxCapacity = capacity;
+            this.capacity = capacity;
+            this.maxOperations = maxOperations;
         }
 
-        public bool AppendMessage(string message) {
-            if (messageCount >= maxCapacity) {
-                Console.WriteLine("Capacity is full. Message was not added.");
-                return false;
+        // Precondition:
+        // Postcondition:
+        public void AppendMessage(string message) {
+            if (messageCount >= capacity) {
+                throw new InvalidOperationException("Message stream is full")
             }
 
             if (message == null || message.Trim() == "") {
-                Console.WriteLine("Invalid message. Message will not be added.")
-                return false;
+                throw new ArgumentException("Message cannot be null or whitespace")
             }
 
-            messages[messageCount] = message;
+            if (operationCount >= maxOperations) {
+                throw new InvalidOperationException("Operation limit has been reached")
+            }
 
-            messageCount++;
+            messages[messageCount++] = message;
             operationCount++;
-
-            return true;
         }
 
+        // Precondition:
+        // Postcondition:
         public string[] ReadMessages(int startRange, int endRange) {
             if (operationCount >= maxOperations) {
                 return null;
             }
 
-            if (startRange < 0 || endRange < 1 || startRange >= messageCount || (startRange + endRange) > messageCount) {
+            if (startRange < 0 || endRange <= startRange || startRange >= messageCount || endRange > messageCount) {
                 return null;
             }
 
-            string[] res = new string[count];
+            int rangeSize = endRange - startRange;
+            string[] res = new string[rangeSize];
 
-            for (int i = 0; i < endRange; i++) {
-
+            for (int i = 0; i < rangeSize; i++) {
+                res[i] = messages[startRange + i];
             }
 
             operationCount++;
@@ -59,13 +63,13 @@ namespace MsgStreamApp {
         }
 
         public void Reset() {
-            messages = new string[maxCapacity];
+            messages = new string[capacity];
             messageCount = 0;
             operationCount = 0;
         }
 
         private bool IsFull() {
-
+            return 
         }
 
         public static void Main(string[] args) {
