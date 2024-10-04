@@ -3,7 +3,8 @@
 
 using System;
 
-namespace MsgStreamApp {
+namespace MsgStream
+{
     // Class invariant:
     // - The "messages" array may only contain valid, non-null, and non-empty strings, each adhering to the maximum length defined by MAX_STRING_LENGTH.
     // - The total number of operations performed on the MsgStream instance must not exceed the limit established by MAX_OPERATIONS, which is set as a multiple of the object's capacity.
@@ -12,7 +13,8 @@ namespace MsgStreamApp {
     // - Clients must be prepared to handle exceptions, particularly those related to invalid message length and capacity limits, to ensure robust error handling.
 
 
-    public class MsgStream {
+    public class MsgStream
+    {
         private string[] messages;
         private const int MAX_CAPACITY = 200;
         private const int MAX_STRING_LENGTH = 150;
@@ -22,24 +24,30 @@ namespace MsgStreamApp {
 
         private int MaxOperations => capacity * 2;
 
-        private bool IsFull() {
+        private bool IsFull()
+        {
             return messageCount >= capacity;
         }
 
-        private bool OperationLimit() {
+        private bool OperationLimit()
+        {
             return operationCount >= MaxOperations;
         }
 
-        private bool IsValidMessage(string message) {
+        private bool IsValidMessage(string message)
+        {
         return message != null && message.Trim() != "" && message.Length <= MAX_STRING_LENGTH;
         }
 
-        private bool ValidateCapacity(int capacity) {
-            if (capacity > MAX_CAPACITY) {
+        private bool ValidateCapacity(int capacity)
+        {
+            if (capacity > MAX_CAPACITY)
+            {
                 throw new ArgumentException($"Capacity exceeded 200, setting capacity to {MAX_CAPACITY}.");
                 capacity = MAX_CAPACITY;
             }
-            if (capacity <= 0) {
+            if (capacity <= 0)
+            {
                 throw new ArgumentOutOfRangeException("Capacity must be between 1 and " + MAX_CAPACITY);
             }
             return true;
@@ -51,7 +59,8 @@ namespace MsgStreamApp {
         // - Capacity must be between 1 and MAX_CAPACITY.
         // Postcondition:
         // - Capacity is initialized and the "messages" array is created.
-        public MsgStream(int capacity) {
+        public MsgStream(int capacity)
+        {
             ValidateCapacity(capacity);
             messages = new string[capacity];
             this.capacity = capacity;
@@ -63,12 +72,14 @@ namespace MsgStreamApp {
         // - The message must be non-null, non-empty, and within the MAX_STRING_LENGTH.
         // Postcondition:
         // - Message is appended to the stream and the message and operation counts are updated.
-        public void AppendMessage(string message) {
+        public void AppendMessage(string message)
+        {
             if (IsFull()) throw new InvalidOperationException("Message stream is full");
             
             if (OperationLimit()) throw new InvalidOperationException("Operation limit has been reached");
             
-            if (!IsValidMessage(message)) {
+            if (!IsValidMessage(message))
+            {
                 throw new ArgumentException("Invalid message: message is either null, empty, or exceeds the maximum allowed length.");
             }
 
@@ -81,17 +92,20 @@ namespace MsgStreamApp {
         // - The start and end ranges must be acceptable within the bounds of the message array.
         // Postcondition:
         // - Returns the messages between the specified start and end range.
-        public string[] ReadMessages(int startRange, int endRange) {
+        public string[] ReadMessages(int startRange, int endRange)
+        {
             if (OperationLimit()) throw new InvalidOperationException("Operation limit reached");
 
-            if (startRange < 0 || endRange <= startRange || startRange >= messageCount || endRange > messageCount) {
+            if (startRange < 0 || endRange <= startRange || startRange >= messageCount || endRange > messageCount)
+            {
                 throw new ArgumentOutOfRangeException("Invalid range for reading messages");
             }
 
             int rangeSize = endRange - startRange;
             string[] res = new string[rangeSize];
 
-            for (int i = 0; i < rangeSize; i++) {
+            for (int i = 0; i < rangeSize; i++)
+            {
                 res[i] = messages[startRange + i];
             }
 
@@ -100,17 +114,25 @@ namespace MsgStreamApp {
             return res;
         }
 
-        public void Reset() {
+        public void Reset()
+        {
             messages = new string[capacity];
             messageCount = 0;
             operationCount = 0;
         }
 
-        public static void Main(string[] args) {
+        public int GetMessageCount()
+        {
+            return messageCount;
+        }
+
+        public static void Main(string[] args)
+        {
             Console.WriteLine("Please enter the capacity for the message stream: ");
 
             int capacity;
-            while (!int.TryParse(Console.ReadLine(), out capacity) || capacity <= 0 || capacity > MAX_CAPACITY) {
+            while (!int.TryParse(Console.ReadLine(), out capacity) || capacity <= 0 || capacity > MAX_CAPACITY)
+            {
                 Console.WriteLine($"Invalid input. Please enter a reasonable capacity between 1 and {MAX_CAPACITY}:");
             }
 
@@ -125,7 +147,8 @@ namespace MsgStreamApp {
                 Console.WriteLine("4. Exit the program");
                 Console.Write("Enter your choice: ");
 
-                while (!int.TryParse(Console.ReadLine(), out input) || input < 1 || input > 4) {
+                while (!int.TryParse(Console.ReadLine(), out input) || input < 1 || input > 4)
+                {
                     Console.WriteLine("Invalid input. Please enter a valid option (1-4):");
                 }
 
@@ -136,9 +159,13 @@ namespace MsgStreamApp {
                         try {
                             msgStream.AppendMessage(message);
                             Console.WriteLine("Message appended successfully.");
-                        } catch (InvalidOperationException ex) {
+                        } 
+                        catch (InvalidOperationException ex)
+                        {
                             Console.WriteLine($"Error: {ex.Message}");
-                        } catch (ArgumentException ex) {
+                        }
+                        catch (ArgumentException ex)
+                        {
                             Console.WriteLine($"Error: {ex.Message}");
                         }
                         break;
@@ -151,12 +178,17 @@ namespace MsgStreamApp {
                             int endRange = int.Parse(Console.ReadLine());
                             string[] messages = msgStream.ReadMessages(startRange, endRange);
                             Console.WriteLine("Messages: ");
-                            foreach (string msg in messages) {
+                            foreach (string msg in messages)
+                            {
                                 Console.WriteLine(msg);
                             }
-                        } catch (ArgumentOutOfRangeException ex) {
+                        } 
+                        catch (ArgumentOutOfRangeException ex)
+                        {
                             Console.WriteLine($"Error: {ex.Message}");
-                        } catch (InvalidOperationException ex) {
+                        }
+                        catch (InvalidOperationException ex)
+                        {
                             Console.WriteLine($"Error: {ex.Message}");
                         }
                         break;
