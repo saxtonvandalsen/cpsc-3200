@@ -12,7 +12,6 @@ namespace MsgStream
     // - Once established, the capacity remains unchanged throughout the lifetime of the object unless reset by the client.
     // - Clients must be prepared to handle exceptions, particularly those related to invalid message length and capacity limits, to ensure robust error handling.
 
-
     public class MsgStream
     {
         private string[] messages;
@@ -53,8 +52,6 @@ namespace MsgStream
             return true;
         }
 
-        // modulo the capacity and operations
-
         // Precondition:
         // - Capacity must be between 1 and MAX_CAPACITY.
         // Postcondition:
@@ -71,7 +68,7 @@ namespace MsgStream
         // - Operation count must not exceed MAX_OPERATIONS.
         // - The message must be non-null, non-empty, and within the MAX_STRING_LENGTH.
         // Postcondition:
-        // - Message is appended to the stream and the message and operation counts are updated.
+        // - Message is appended to the stream; the message and operation counts are updated.
         public void AppendMessage(string message)
         {
             if (IsFull()) throw new InvalidOperationException("Message stream is full");
