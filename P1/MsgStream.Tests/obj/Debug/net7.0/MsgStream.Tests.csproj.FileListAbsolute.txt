@@ -1,0 +1,5 @@
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/MsgStream.Tests/obj/Debug/net7.0/MsgStream.Tests.csproj.AssemblyReference.cache
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/MsgStream.Tests/obj/Debug/net7.0/MsgStream.Tests.GeneratedMSBuildEditorConfig.editorconfig
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/MsgStream.Tests/obj/Debug/net7.0/MsgStream.Tests.AssemblyInfoInputs.cache
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/MsgStream.Tests/obj/Debug/net7.0/MsgStream.Tests.AssemblyInfo.cs
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/MsgStream.Tests/obj/Debug/net7.0/MsgStream.Tests.csproj.CoreCompileInputs.cache
