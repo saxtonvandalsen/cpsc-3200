@@ -13,3 +13,8 @@
 /Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/obj/Debug/net7.0/cpsc-3200.pdb
 /Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/obj/Debug/net7.0/cpsc-3200.genruntimeconfig.cache
 /Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/obj/Debug/net7.0/ref/cpsc-3200.dll
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/obj/Debug/net7.0/cpsc-3200.csproj.AssemblyReference.cache
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/obj/Debug/net7.0/cpsc-3200.GeneratedMSBuildEditorConfig.editorconfig
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/obj/Debug/net7.0/cpsc-3200.AssemblyInfoInputs.cache
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/obj/Debug/net7.0/cpsc-3200.AssemblyInfo.cs
+/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/obj/Debug/net7.0/cpsc-3200.csproj.CoreCompileInputs.cache

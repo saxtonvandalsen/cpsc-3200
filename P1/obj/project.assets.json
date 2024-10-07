@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/cpsc-3200.csproj",
+      "projectUniqueName": "/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/cpsc-3200.csproj",
       "projectName": "cpsc-3200",
-      "projectPath": "/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/cpsc-3200.csproj",
+      "projectPath": "/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/cpsc-3200.csproj",
       "packagesPath": "/Users/SaxtonVanDalsen/.nuget/packages/",
-      "outputPath": "/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/obj/",
+      "outputPath": "/Users/SaxtonVanDalsen/Desktop/Programming/cpsc-3200/P1/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/SaxtonVanDalsen/.nuget/NuGet/NuGet.Config"
