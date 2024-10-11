@@ -1,11 +1,13 @@
 // Saxton Van Dalsen
 // 10/15/2024
 
+#ifndef MSGSTREAM_H
+#define MSGSTREAM_H
 #include <string>
 
 using namespace std;
 
-class MsgSteam
+class MsgStream
 {
     // Class invariant:
     // - The "messages" array may only contain valid, non-null, and non-empty strings, each adhering to the maximum length defined by MAX_STRING_LENGTH.
@@ -24,8 +26,8 @@ class MsgSteam
 
         int getMaxOperations() const;
         bool isFull();
-        bool getOperationCount();
-        bool isValidMessage();
+        bool operationLimit();
+        bool isValidMessage(string message);
         bool ValidateCapacity(int capacity);
 
         
@@ -35,3 +37,5 @@ class MsgSteam
         void reset();
         int getMessageCount();
 };
+
+#endif
