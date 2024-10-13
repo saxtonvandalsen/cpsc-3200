@@ -17,25 +17,31 @@ class MsgStream
     // - Clients must be prepared to handle exceptions, particularly those related to invalid message length and capacity limits, to ensure robust error handling.
 
     private:
-        string messages[10] = {};
-        const int MAX_CAPACITY = 200;
+        static const int MAX_CAPACITY = 200;
         const int MAX_STRING_LENGTH = 150;
+        const int MAX_OPERATIONS_MULTIPLIER = 2;
+
+        char** messages;
         int capacity;
         int operationCount;
         int messageCount;
 
         int getMaxOperations() const;
-        bool isFull();
-        bool operationLimit();
-        bool isValidMessage(string message);
-        bool ValidateCapacity(int capacity);
+        bool isFull() const;
+        bool operationLimit() const;
+        bool isValidMessage(const char* message) const;
+        int validateCapacity(int capacity);
 
         
     public:
-        string* ReadMessages(int startRange, int endRange);
-        void appendMessage(string message);
+        MsgStream(int capacity);
+        ~MsgStream();
+
+        string* readMessages(int startRange, int endRange);
+        void appendMessage(const string& message);
         void reset();
-        int getMessageCount();
+        int getMessageCount() const;
+        int getCapacity() const;
 };
 
 #endif
