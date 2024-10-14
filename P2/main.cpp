@@ -3,42 +3,38 @@
 
 // Testing of MsgStream class
 int main() {
-    // Create a MsgStream with a capacity of 5
-    MsgStream msgStream(5);
-    
-    // Append messages
     try {
-        msgStream.appendMessage("Hello, World!");
-        msgStream.appendMessage("Testing message stream.");
-        msgStream.appendMessage("Another message.");
-        msgStream.appendMessage("Yet another message.");
-        msgStream.appendMessage("Last message."); // Should work
-        msgStream.appendMessage("This message should fail."); // Should throw an overflow error
-    } catch (const std::exception& e) {
-        std::cerr << "Error while appending message: " << e.what() << std::endl;
-    }
+        // Create a message stream
+        MsgStream stream(5);
+        stream.appendMessage("Hello, World!");
+        stream.appendMessage("Testing message stream.");
+        stream.appendMessage("Another message.");
+        stream.appendMessage("Yet another message.");
+        stream.appendMessage("Last message.");
 
-    // Read messages
-    try {
-        char** messages = msgStream.readMessages(0, msgStream.getMessageCount());
-        for (int i = 0; i < msgStream.getMessageCount(); ++i) {
-            std::cout << "Message " << i + 1 << ": " << messages[i] << std::endl;
+        // Test copy constructor
+        MsgStream copyStream = stream;
+        std::cout << "Messages from copyStream after using copy constructor:" << std::endl;
+        for (int i = 0; i < copyStream.getMessageCount(); ++i) {
+            std::cout << "Message " << i + 1 << ": " << copyStream.readMessages(i, i + 1)[0] << std::endl;
         }
-        delete[] messages; // Free the result array
-    } catch (const std::exception& e) {
-        std::cerr << "Error while reading messages: " << e.what() << std::endl;
-    }
 
-    // Reset the MsgStream
-    msgStream.reset();
-    std::cout << "Messages after reset: " << msgStream.getMessageCount() << std::endl;
+        // Test assignment operator
+        MsgStream assignedStream(3);
+        assignedStream = stream;
+        std::cout << "Messages from assignedStream after using assignment operator:" << std::endl;
+        for (int i = 0; i < assignedStream.getMessageCount(); ++i) {
+            std::cout << "Message " << i + 1 << ": " << assignedStream.readMessages(i, i + 1)[0] << std::endl;
+        }
 
-    // Append messages after reset to test functionality
-    try {
-        msgStream.appendMessage("New message after reset.");
-        std::cout << "Messages after appending post-reset: " << msgStream.getMessageCount() << std::endl;
+        // Reset and append new messages to check behavior
+        stream.reset();
+        stream.appendMessage("New message after reset.");
+        std::cout << "Messages after reset and append to original stream:" << std::endl;
+        std::cout << "Message 1: " << stream.readMessages(0, 1)[0] << std::endl;
+
     } catch (const std::exception& e) {
-        std::cerr << "Error while appending message: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl;
     }
 
     return 0;
