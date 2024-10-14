@@ -27,6 +27,56 @@ MsgStream::~MsgStream()
     delete[] messages;
 }
 
+MsgStream::MsgStream(const MsgStream& other)
+{
+    capacity = other.capacity;
+    maxOperations = other.maxOperations;
+    messageCount = other.messageCount;
+    operationCount = other.operationCount;
+
+    messages = new char*[capacity];
+
+    for (int i = 0; i < messageCount; i++)
+    {
+        messages[i] = new char[strlen(other.messages[i]) + 1];
+        strcpy(messages[i], other.messages[i]);
+    }
+
+    for (int i = messageCount; i < capacity; i++)
+        messages[i] = nullptr;
+}
+
+MsgStream& MsgStream::operator=(const MsgStream& other)
+{
+    if (this == &other) return *this;
+
+    for (int i = 0; i < messageCount; i++)
+    {
+        delete[] messages[i]; 
+    }
+    delete[] messages;
+
+    capacity = other.capacity;
+    maxOperations = other.maxOperations;
+    messageCount = other.messageCount;
+    operationCount = other.operationCount;
+
+    messages = new char*[capacity];
+
+    for (int i = 0; i < messageCount; i++)
+    {
+        messages[i] = new char[strlen(other.messages[i]) + 1];
+        strcpy(messages[i], other.messages[i]);
+    }
+
+    for (int i = messageCount; i < capacity; i++)
+    {
+        messages[i] = nullptr;
+    }
+
+    return *this;
+}
+
 char** MsgStream::readMessages(int startRange, int endRange)
 {
     if (operationLimit())
