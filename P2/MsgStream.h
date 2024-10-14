@@ -3,7 +3,6 @@
 
 #ifndef MSGSTREAM_H
 #define MSGSTREAM_H
-#include <string>
 
 using namespace std;
 
@@ -37,6 +36,8 @@ class MsgStream
     public:
         MsgStream(int capacity);
         ~MsgStream();
+        MsgStream(const MsgStream& other);
+        MsgStream& operator=(const MsgStream& other);
 
         char** readMessages(int startRange, int endRange);
         void appendMessage(const char* message);
