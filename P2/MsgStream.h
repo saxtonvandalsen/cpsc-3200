@@ -19,28 +19,30 @@ class MsgStream
     private:
         static const int MAX_CAPACITY = 200;
         const int MAX_STRING_LENGTH = 150;
-        const int MAX_OPERATIONS_MULTIPLIER = 2;
 
         char** messages;
         int capacity;
+        int maxOperations;
         int operationCount;
         int messageCount;
 
-        int getMaxOperations() const;
+        int calculateMaxOperations(int capacity);
         bool isFull() const;
         bool operationLimit() const;
         bool isValidMessage(const char* message) const;
-        int validateCapacity(int capacity);
+        int calculateCapacity(int capacity);
+        bool isInvalidRange(int startRange, int endRange) const;
 
         
     public:
         MsgStream(int capacity);
         ~MsgStream();
 
-        string* readMessages(int startRange, int endRange);
-        void appendMessage(const string& message);
+        char** readMessages(int startRange, int endRange);
+        void appendMessage(const char* message);
         void reset();
         int getMessageCount() const;
+        int getMaxOperations() const;
         int getCapacity() const;
 };
 
