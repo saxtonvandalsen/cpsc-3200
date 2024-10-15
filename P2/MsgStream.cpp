@@ -166,6 +166,7 @@ int MsgStream::calculateCapacity(int cap)
     if (cap <= 0) {
         cap = 1;
     }
+    
     return cap;
 }
 
