@@ -11,19 +11,20 @@ class PartitionStream {
     private:
 
         struct Partition {
-            char key[30];
+            char* key;
             MsgStream* stream;
         };
 
-        Partition* partition;
+        Partition* partitions;
         int partitionCount;
         int capacity;
 
         bool validateParitionKey(const char* key) const;
         int findPartitionIndex(const char* key) const;
+        int verifyCapacity(int capacity);
 
     public:
-        PartitionStream(int capacity, const MsgStream* streams, const char keys[][30]);
+        PartitionStream(int initialCapacity, const MsgStream* streams);
         PartitionStream(const PartitionStream& other);
         PartitionStream& operator=(const PartitionStream& other);
         ~PartitionStream();
@@ -32,6 +33,7 @@ class PartitionStream {
         char** readMessage(const char* partitionKey, int startRange, int endRange);
         void reset();
         int getPartitionCount() const;
+        int getCapacity() const;
 };
 
 #endif
