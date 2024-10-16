@@ -27,6 +27,8 @@ class PartitionStream {
         PartitionStream(int initialCapacity, const MsgStream* streams);
         PartitionStream(const PartitionStream& other);
         PartitionStream& operator=(const PartitionStream& other);
+        PartitionStream(PartitionStream&& src) noexcept;
+        PartitionStream& operator=(PartitionStream&& src) noexcept;
         ~PartitionStream();
 
         void appendMessage(const char* paritionKey, const char* message);
