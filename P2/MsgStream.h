@@ -4,8 +4,6 @@
 #ifndef MSGSTREAM_H
 #define MSGSTREAM_H
 
-using namespace std;
-
 class MsgStream
 {
     // Class invariant:
