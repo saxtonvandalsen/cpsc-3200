@@ -77,6 +77,38 @@ MsgStream& MsgStream::operator=(const MsgStream& other)
     return *this;
 }
 
+MsgStream::MsgStream(MsgStream&& src) noexcept 
+    : messages(src.messages), capacity(src.capacity), maxOperations(src.maxOperations), 
+      messageCount(src.messageCount), operationCount(src.operationCount) {
+
+    src.messages = nullptr;
+    src.capacity = 0;
+    src.maxOperations = 0;
+    src.messageCount = 0;
+    src.operationCount = 0;
+}
+
+MsgStream& MsgStream::operator=(MsgStream&& src) noexcept
+{
+    if (this == &src) return *this;
+
+    reset();
+
+    messages = src.messages;
+    capacity = src.capacity;
+    maxOperations = src.maxOperations;
+    messageCount = src.messageCount;
+    operationCount = src.operationCount;
+
+    src.messages = nullptr;
+    src.capacity = 0;
+    src.maxOperations = 0;
+    src.messageCount = 0;
+    src.operationCount = 0;
+
+    return *this;
+}
+
 char** MsgStream::readMessages(int startRange, int endRange)
 {
     if (operationLimit())
@@ -166,7 +198,7 @@ int MsgStream::calculateCapacity(int cap)
     if (cap <= 0) {
         cap = 1;
     }
-    
+
     return cap;
 }
 
