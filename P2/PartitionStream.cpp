@@ -12,7 +12,6 @@ using namespace std;
 
 PartitionStream::PartitionStream(int initialCapacity, const MsgStream* streams)
     : partitionCount(0), capacity(verifyCapacity(initialCapacity)) {
-    try {
         partitions = new Partition[capacity];
 
         for (int i = 0; i < capacity; i++)
@@ -22,21 +21,10 @@ PartitionStream::PartitionStream(int initialCapacity, const MsgStream* streams)
                 partitions[i].stream = new MsgStream(streams[i]);
             } else
             {
-                throw std::invalid_argument("Streams cannot be null.");
+                throw invalid_argument("Streams cannot be null.");
             }
             partitions[i].key = nullptr;
         }
-    }
-    catch (const bad_alloc& e)
-    {
-        cerr << "Memory allocation failed: " << e.what() << endl;
-        throw;
-    }
-    catch (const exception& e)
-    {
-        cerr << "Error in constructor: " << e.what() << endl;
-        throw;
-    }
 }
 
 PartitionStream::PartitionStream(const PartitionStream& other)
@@ -119,13 +107,18 @@ PartitionStream::~PartitionStream()
 
 void PartitionStream::appendMessage(const char* partitionKey, const char* message)
 {
+    if (!validatePartitionKey(partitionKey))
+    {
+        throw std::invalid_argument("Invalid partition key");
+    }
+
     int index = findPartitionIndex(partitionKey);
 
     if (index == -1)
     {
         if (getPartitionCount() >= capacity)
         {
-            throw std::overflow_error("No space left for a new partition");
+            throw overflow_error("No space left for a new partition");
         }
 
         try {
@@ -143,6 +136,7 @@ void PartitionStream::appendMessage(const char* partitionKey, const char* messag
 
     partitions[index].stream->appendMessage(message);
 }
+
 
 char** PartitionStream::readMessage(const char* partitionKey, int startRange, int endRange)
 {
@@ -168,16 +162,21 @@ void PartitionStream::reset()
     partitionCount = 0;
 }
 
-bool PartitionStream::validateParitionKey(const char* key) const
+bool PartitionStream::validatePartitionKey(const char* key) const
 {
     return key != nullptr && strlen(key) > 0;
 }
 
 int PartitionStream::findPartitionIndex(const char* key) const
 {
+    if (!validatePartitionKey(key))
+    {
+        return -1; // Key is invalid
+    }
+
     for (int i = 0; i < partitionCount; i++)
     {
-        if (strcmp(partitions[i].key, key) == 0)
+        if (partitions[i].key != nullptr && strcmp(partitions[i].key, key) == 0)
         {
             return i;
         }
