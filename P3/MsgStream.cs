@@ -1,9 +1,9 @@
 // Saxton Van Dalsen
-// Date: 10/03/2024
+// Date: 10/28/2024
 
 using System;
 
-namespace MsgStream
+namespace MsgStreamLibrary
 {
     // Class invariant:
     // - The "messages" array may only contain valid, non-null, and non-empty strings, each adhering to the maximum length defined by MAX_STRING_LENGTH.
