@@ -119,6 +119,28 @@ namespace PartitionStreamLibrary
             }
             operationCount = 0;
         }
+        
+        // Preconditions:
+        // - PartitionStream must have been properly initialized with valid MsgStream objects
+        // - Each MsgStream object should implement the Clone() method for deep copying
+        // Postcondtions:
+        // - New PartitionStream will get same capacity and partition count as the original
+        // - No reference to original MsgStream objects is maintained in deep copy (no shared references)
+        // - Returns new PartitionStream object containing independent copies of all encapsulated MsgStream objects from original
+        public PartitionStream DeepCopy()
+        {
+            Dictionary<int, MsgStream> copyStreams = new Dictionary<int, MsgStream>();
+
+            foreach (var stream in msgStreams)
+            {
+                MsgStream cloneStream = stream.Value.Clone();
+                copyStreams[stream.Key] = cloneStream;
+            }
+
+            PartitionStream deepCopyStream = new PartitionStream(copyStreams.Values, this.capacity);
+
+            return deepCopyStream;
+        }
 
         public int GetPartitionCount()
         {
