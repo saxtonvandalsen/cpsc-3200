@@ -9,7 +9,10 @@ using System.Linq;
 namespace PartitionStreamLibrary
 {
     // Class invariant:
-    // 
+    // PartitionStream must maintain a non-null Dictionary of MsgStream objects
+    // Number of MsgStreams (partition count) should not exceed the specified capacity
+    // Each MsgStream in msgStreams must be valid by MsgStream class, initialized, and have a unique integer key
+    // Capacity must be between 1 and MAX_CAPACITY (200)
     public class PartitionStream
     {
 
@@ -19,6 +22,12 @@ namespace PartitionStreamLibrary
         private int key;
         private int partitionCount;
 
+        // Preconditions:
+        // - capacity should be an integer within limits 1 to MAX_CAPACITY (200)
+        // Postconditions:
+        // - Sets capacity to MAX_CAPACITY (200) if given a capacity greater than that limit
+        // - Sets capacity to 1 if given a capacity less than 0
+        // - Returns true if the capacity is valid
         private bool ValidateCapacity(int capacity)
         {
             if (capacity > MAX_CAPACITY)
@@ -29,41 +38,64 @@ namespace PartitionStreamLibrary
             if (capacity <= 0)
             {
                 throw new ArgumentOutOfRangeException("Capacity must be between 1 and " + MAX_CAPACITY);
+                capacity = 1;
             }
             return true;
         }
 
+        // Preconditions:
+        // - streams collection must not be null
+        // Postconditions:
+        // - Returns true is the streams collection is empty or null
         private bool ValidateStreams(IEnumerable<MsgStream> streams)
         {
             return streams == null || !streams.Any();
         }
 
+        // Preconditions:
+        // - Partition key must exist within msgStreams collection
+        // Postconditions:
+        // - Returns true if the specified partition has reached its operation limit based
+        // on MsgStream restrictions
         private bool OperationLimitReached(int partitionKey)
         {
             return msgStreams[partitionKey].OperationLimit();
         }
 
+        // Preconditions:
+        // - Partition key should be a valid key within msgStreams collection
+        // Postconditions:
+        // - Returns true if the specified partition exists in msgStreams collection
         private bool ValidatePartitionKey(int partitionKey)
         {
             return msgStreams.ContainsKey(partitionKey);
         }
 
+        // Preconditions:
+        // - Partition key must exist within msgSteams collection
+        // Postconditions:
+        // - Returns true if specified partition has reach capacity
         private bool IsFull(int partitionKey)
         {
             return msgStreams[partitionKey].IsFull();
         }
 
         // Preconditions:
-        // - 
+        // - Partition key must exist within msgStreams collection
+        // - message must not be null, non-empty, and within message length restrictions
+        // Postconditions:
+        // - Returns true if specified partition's message meets requirements
         private bool IsValidMessage(int partitionKey, string message)
         {
             return msgStreams[partitionKey].IsValidMessage(message);
         }
 
         // Preconditions:
-        // -
+        // - streams collection must not be null & must have fewer or equal elements than capacity
         // Postconditions:
-        // - 
+        // - Initializes msgStreams with provided MsgStream streams through dependency injection.
+        // - Keys are assigned sequentially for each stream
+        // - Sets initial partition count to number of valid streams provided
         public PartitionStream(IEnumerable<MsgStream> streams, int capacity)
         {
             if (ValidateStreams(streams)) throw new ArgumentException("Invalid streams provided.");
@@ -102,6 +134,10 @@ namespace PartitionStreamLibrary
             msgStreams[partitionKey].AppendMessage(message);
         }
 
+        // Preconditions:
+        // -
+        // Postconditions:
+        // - 
         public string[] ReadMessage(int partitionKey, int startRange, int endRange)
         {
             if (!ValidatePartitionKey(partitionKey)) throw new ArgumentException("Invalid partition key.");
@@ -111,15 +147,19 @@ namespace PartitionStreamLibrary
             return msgStreams[partitionKey].ReadMessages(startRange, endRange);
         }
 
+        // Preconditions:
+        // -
+        // Postconditions:
+        // - 
         public void Reset()
         {
             foreach (var stream in msgStreams.Values)
             {
                 stream.Reset();
             }
-            operationCount = 0;
+            partitionCount = 0;
         }
-        
+
         // Preconditions:
         // - PartitionStream must have been properly initialized with valid MsgStream objects
         // - Each MsgStream object should implement the Clone() method for deep copying
@@ -133,7 +173,7 @@ namespace PartitionStreamLibrary
 
             foreach (var stream in msgStreams)
             {
-                MsgStream cloneStream = stream.Value.Clone();
+                MsgStream cloneStream = stream.Value.DeepCopy();
                 copyStreams[stream.Key] = cloneStream;
             }
 
@@ -157,7 +197,9 @@ namespace PartitionStreamLibrary
             return msgStreams.Keys.ToList();
         }
     }
+    // Implementation invariant:
+    // msgStream dictionary must not be null and should not exceed capacity
+    // Each MsgStream in msgStreams should be initialized and should be functionable with its methods
+    // Operation limit for each MsgStream should be respected by OperationLimitReached from PartitionStream
+    // All methods that modify or access msgStreams should validate the partition key associated
 }
-
-// Capacity defines the maximum number of MsgSteam objects being allowed.
-// PartitionCount is representing the number of MsgStream objects being added.
