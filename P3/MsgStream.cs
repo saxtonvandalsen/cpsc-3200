@@ -111,6 +111,29 @@ namespace MsgStreamLibrary
             return res;
         }
 
+        // Preconditions:
+        //
+        // Postcondtions:
+        // 
+        public MsgStream DeepCopy()
+        {
+            MsgStream copy = new MsgStream(this.capacity);
+
+            for (int i = 0; i < this.messageCount; i++)
+            [
+                copy.messages[i] = this.messages[i];
+            ]
+
+            copy.messageCount = this.messageCount;
+            copy.operationCount = this.operationCount;
+
+            return copy;
+        }
+
+        // Preconditions:
+        // 
+        // Postconditions:
+        // 
         public void Reset()
         {
             messages = new string[capacity];
