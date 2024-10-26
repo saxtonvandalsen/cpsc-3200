@@ -21,6 +21,7 @@ namespace PartitionStreamLibrary
         private int capacity;
         private int key;
         private int partitionCount;
+        private int operationCount;
 
         // Preconditions:
         // - capacity should be an integer within limits 1 to MAX_CAPACITY (200)
@@ -32,8 +33,8 @@ namespace PartitionStreamLibrary
         {
             if (capacity > MAX_CAPACITY)
             {
-                throw new ArgumentException($"Capacity exceeded {MAX_CAPACITY}, setting capacity to {MAX_CAPACITY}.");
                 capacity = MAX_CAPACITY;
+                throw new ArgumentException($"Capacity exceeded {MAX_CAPACITY}, setting capacity to {MAX_CAPACITY}.");
             }
             if (capacity <= 0)
             {
@@ -53,13 +54,13 @@ namespace PartitionStreamLibrary
         }
 
         // Preconditions:
-        // - Partition key must exist within msgStreams collection
+        // - Capacity is set and is for the limit of each MsgStream's operation limit
         // Postconditions:
         // - Returns true if the specified partition has reached its operation limit based
         // on MsgStream restrictions
-        private bool OperationLimitReached(int partitionKey)
+        private bool OperationLimitReached()
         {
-            return msgStreams[partitionKey].OperationLimit();
+            return operationCount >= capacity * 2;
         }
 
         // Preconditions:
@@ -72,22 +73,21 @@ namespace PartitionStreamLibrary
         }
 
         // Preconditions:
-        // - Partition key must exist within msgSteams collection
+        // - Capacity is set and represents maximum allowed count for the partiton
         // Postconditions:
         // - Returns true if specified partition has reach capacity
-        private bool IsFull(int partitionKey)
+        private bool IsFull()
         {
-            return msgStreams[partitionKey].IsFull();
+            return partitionCount >= capacity;
         }
 
         // Preconditions:
-        // - Partition key must exist within msgStreams collection
         // - message must not be null, non-empty, and within message length restrictions
         // Postconditions:
         // - Returns true if specified partition's message meets requirements
-        private bool IsValidMessage(int partitionKey, string message)
+        private bool IsValidMessage(string message)
         {
-            return msgStreams[partitionKey].IsValidMessage(message);
+            return message != null && message.Trim() != "";
         }
 
         // Preconditions:
@@ -115,34 +115,40 @@ namespace PartitionStreamLibrary
         }
 
         // Preconditions:
-        // -
+        // - Partition key must be valid within msgStreams
+        // - Message should be valid, non-null, and also not exceed MsgStreams length limit
         // Postconditions:
-        // - 
+        // - Adds message to specified MsgStream based on key, if within capacity and operation limit
         public void AddMessage(int partitionKey, string message)
         {
             if (!ValidatePartitionKey(partitionKey)) throw new ArgumentException("Invalid partition key.");
 
-            if (IsFull(partitionKey)) throw new InvalidOperationException("Partition stream is full");
+            if (IsFull()) throw new InvalidOperationException("Partition stream is full");
 
-            if (!IsValidMessage(partitionKey, message))
+            if (!IsValidMessage(message))
             {
                 throw new ArgumentException("Invalid message: message is either null, empty, or exceeds the maximum allowed length.");
             }
 
-            if(OperationLimitReached(partitionKey)) throw new InvalidOperationException("Operation limit has been reached.");
+            if(OperationLimitReached()) throw new InvalidOperationException("Operation limit has been reached.");
+
+            operationCount++;
 
             msgStreams[partitionKey].AppendMessage(message);
         }
 
         // Preconditions:
-        // -
+        // - Partition key must be valid within msgStreams
+        // - Start range and end range should be valid ranges within MsgStreams bounds
         // Postconditions:
-        // - 
+        // - Returns array of messages from given start range to end range in specified partition based on key
         public string[] ReadMessage(int partitionKey, int startRange, int endRange)
         {
             if (!ValidatePartitionKey(partitionKey)) throw new ArgumentException("Invalid partition key.");
 
-            if (OperationLimitReached(partitionKey)) throw new InvalidOperationException("Operation limit has been reached ");
+            if (OperationLimitReached()) throw new InvalidOperationException("Operation limit has been reached ");
+
+            operationCount++:
 
             return msgStreams[partitionKey].ReadMessages(startRange, endRange);
         }
@@ -150,7 +156,8 @@ namespace PartitionStreamLibrary
         // Preconditions:
         // -
         // Postconditions:
-        // - 
+        // - Clears all MsgStream entries for certain partiton
+        // - resets partiton count and operation count to 0
         public void Reset()
         {
             foreach (var stream in msgStreams.Values)
@@ -158,6 +165,7 @@ namespace PartitionStreamLibrary
                 stream.Reset();
             }
             partitionCount = 0;
+            operationCount = 0;
         }
 
         // Preconditions:
