@@ -112,17 +112,18 @@ namespace MsgStreamLibrary
         }
 
         // Preconditions:
-        //
-        // Postcondtions:
-        // 
-        public MsgStream DeepCopy()
+        // - The current instance must have valid messages stored
+        // Postconditions:
+        // - A deep copy of the MsgStream instance is created, with the same messages, 
+        // message count, and operation count
+        public virtual MsgStream DeepCopy()
         {
             MsgStream copy = new MsgStream(this.capacity);
 
             for (int i = 0; i < this.messageCount; i++)
-            [
-                copy.messages[i] = this.messages[i];
-            ]
+            {
+                    copy.messages [i] = this.messages[i];
+            }
 
             copy.messageCount = this.messageCount;
             copy.operationCount = this.operationCount;
@@ -131,9 +132,10 @@ namespace MsgStreamLibrary
         }
 
         // Preconditions:
-        // 
+        // - The stream must be initialized and able to reset its state
         // Postconditions:
-        // 
+        // - The message count and operation count are reset to zero, 
+        // and the messages array is re-initialized
         public void Reset()
         {
             messages = new string[capacity];
@@ -226,6 +228,12 @@ namespace MsgStreamLibrary
         }
     }
     // Implementation invariant:
-    // - The message stream must always maintain its message count and operation count within the defined limits.
-    // - The "messages" array should always contain valid messages that meet the set constraints.
+    // - The MsgStream class requires that all subclasses adhere to the defined 
+    //   class and implementation invariants
+    // - Any subclass must ensure that the integrity of the messages array is maintained, that valid message 
+    //   limits are enforced, and that the operation limits are respected during 
+    //   the lifespan of the instance
+    // - Subclasses may introduce additional preconditions and postconditions as necessary to support their extended 
+    //   functionality
+    // - Clients should refer to subclass documentation for more details
 }
