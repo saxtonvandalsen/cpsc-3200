@@ -4,6 +4,11 @@
 #ifndef MSGSTREAM_H
 #define MSGSTREAM_H
 
+#include <memory>
+#include <string>
+
+using namespace std;
+
 class MsgStream
 {
     // Class invariant:
@@ -17,7 +22,7 @@ class MsgStream
         static const int MAX_CAPACITY = 200;
         const int MAX_STRING_LENGTH = 150;
 
-        char** messages;
+        unique_ptr<string[]> messages;
         int capacity;
         int maxOperations;
         int operationCount;
@@ -26,7 +31,7 @@ class MsgStream
         int calculateMaxOperations(int capacity);
         bool isFull() const;
         bool operationLimit() const;
-        bool isValidMessage(const char* message) const;
+        bool isValidMessage(const string& message) const;
         int calculateCapacity(int capacity);
         bool isInvalidRange(int startRange, int endRange) const;
 
@@ -47,7 +52,7 @@ class MsgStream
         // - The start and end ranges must be acceptable within the bounds of the message array.
         // Postcondition:
         // - Returns the messages between the specified start and end range.
-        char** readMessages(int startRange, int endRange);
+        unique_ptr<string[]> readMessages(int startRange, int endRange);
 
         // Precondition:
         // - Message stream must not be full.
@@ -55,7 +60,7 @@ class MsgStream
         // - The message must be non-null, non-empty, and within the MAX_STRING_LENGTH.
         // Postcondition:
         // - Message is appended to the stream; the message and operation counts are updated.
-        void appendMessage(const char* message);
+        void appendMessage(const string& message);
         void reset();
         int getMessageCount() const;
         int getMaxOperations() const;
