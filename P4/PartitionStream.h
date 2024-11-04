@@ -4,6 +4,8 @@
 #ifndef PARTITIONSTREAM_H
 #define PARTITIONSTREAM_H
 
+#include "MsgStream.h"
+
 class PartitionStream {
 
     private:
