@@ -4,6 +4,7 @@
 #include "MsgStream.h"
 #include <string>
 #include <memory>
+#include <stdexcept>
 
 using namespace std;
 
@@ -27,6 +28,91 @@ MsgStream::MsgStream(const MsgStream& other)
     {
         messages[i] = other.messages[i];
     }
+}
+
+MsgStream& MsgStream::operator=(const MsgStream& other)
+{
+    if (this == &other) return *this;
+
+    unique_ptr<string[]> newMessages = make_unique<string[]>(other.capacity);
+
+    for (int i = 0; i < other.messageCount; i++)
+    {
+        newMessages[i] = other.messages[i];
+    }
+
+    capacity = other.capacity;
+    maxOperations = other.maxOperations;
+    messageCount = other.messageCount;
+    operationCount = other.operationCount;
+
+    messages = move(newMessages);
+
+    return *this;
+}
+
+MsgStream::MsgStream(MsgStream&& other) noexcept
+    : messages(nullptr), capacity(0), maxOperations(0), messageCount(0), operationCount(0) {
+        swap(messages, other.messages);
+        swap(capacity, other.capacity);
+        swap(maxOperations, other.maxOperations);
+        swap(messageCount, other.messageCount);
+        swap(operationCount, other.operationCount);
+}
+
+MsgStream& MsgStream::operator=(MsgStream&& other) noexcept
+{
+    if (this == &other) return *this;
+
+    messages = move(other.messages);
+
+    capacity = other.capacity;
+    maxOperations = other.maxOperations;
+    messageCount = other.messageCount;
+    operationCount = other.operationCount;
+
+    other.capacity = 0;
+    other.messageCount = 0;
+    other.operationCount = 0;
+
+    return *this;
+}
+
+unique_ptr<string[]> MsgStream::readMessages(int startRange, int endRange)
+{
+    if (operationLimit())
+        throw runtime_error("Operation limit has been reached.");
+
+    if (isInvalidRange(startRange, endRange))
+        throw out_of_range("Invalid range for reading messages.");
+
+    int range = endRange - startRange + 1;
+    unique_ptr<string[]> readMessages = make_unique<string[]>(range);
+
+    for (int i = 0; i < range; i++)
+    {
+        readMessages[i] = messages[startRange + i];
+    }
+
+    operationCount++;
+    return readMessages;
+}
+
+void MsgStream::appendMessage(const string& message)
+{
+    if (operationLimit())
+        throw runtime_error("Operation limit has been reached.");
+
+    if (isFull())
+        throw runtime_error("Capacity has been reached.");
+
+    if (!isValidMessage(message))
+        throw runtime_error("Invalid message.");
+
+    messages[messageCount] = message;
+
+    messageCount++;
+    operationCount++;
 }
 
 int MsgStream::calculateMaxOperations(int capacity)
