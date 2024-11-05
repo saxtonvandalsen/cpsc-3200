@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <stdexcept>
 
 using namespace std;
 
@@ -44,8 +45,8 @@ class MsgStream
         MsgStream(int capacity);
         MsgStream(const MsgStream& other);
         MsgStream& operator=(const MsgStream& other);
-        MsgStream(MsgStream&& src) noexcept;
-        MsgStream& operator=(MsgStream&& src) noexcept;
+        MsgStream(MsgStream&& other) noexcept;
+        MsgStream& operator=(MsgStream&& other) noexcept;
 
         // Precondition:
         // - Operation count must not exceed MAX_OPERATIONS.
