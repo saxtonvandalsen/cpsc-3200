@@ -20,7 +20,7 @@ class PartitionStream {
         unique_ptr<MsgStream[]> streams;
         unique_ptr<int[]> keys;
         int capacity;
-        int streamCount;
+        int partitionCount;
         int operationCount;
 
         PartitionStream(const PartitionStream& other);
@@ -28,8 +28,8 @@ class PartitionStream {
         PartitionStream(PartitionStream&& other) noexcept;
         PartitionStream& operator=(PartitionStream&& other) noexcept;
 
-        int findPartitionIndex(const string& key) const;
-        bool validatePartitionKey(const string& key) const;
+        int findPartitionIndex(const int& key) const;
+        bool validatePartitionKey(const int& key) const;
         int verifyCapacity(int initialCapacity);
         bool operationLimitReached();
         bool isFull();
@@ -38,8 +38,8 @@ class PartitionStream {
     public:
         PartitionStream(int initialCapacity);
 
-        void writeMessage(string& message);
-        unique_ptr<MsgStream[]> readMessage(int startRange, int endRange);
+        void writeMessage(const int& key, const string& message);
+        unique_ptr<string[]> readMessage(const int& key, int startRange, int endRange);
         int getCapacity();
         int getPartitionCount();
         unique_ptr<int[]> getPartitionKeys();
