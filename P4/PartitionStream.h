@@ -11,8 +11,8 @@
 
 using namespace std;
 
-class PartitionStream {
-
+class PartitionStream
+{
     // Class invariant:
     // 
 
