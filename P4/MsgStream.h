@@ -30,23 +30,13 @@ class MsgStream
         int messageCount;
 
         int calculateMaxOperations(int capacity);
-        bool isFull() const;
-        bool operationLimit() const;
-        bool virtual isValidMessage(const string& message) const;
         int calculateCapacity(int capacity);
         bool isInvalidRange(int startRange, int endRange) const;
 
-        
-    public:
-        // Precondition:
-        // - Capacity must be between 1 and MAX_CAPACITY.
-        // Postcondition:
-        // - Capacity is initialized and the "messages" array is created.
-        MsgStream(int capacity);
-        MsgStream(const MsgStream& other);
-        MsgStream& operator=(const MsgStream& other);
-        MsgStream(MsgStream&& other) noexcept;
-        MsgStream& operator=(MsgStream&& other) noexcept;
+    protected:
+        bool virtual isFull() const;
+        bool virtual operationLimit() const;
+        bool virtual isValidMessage(const string& message) const;
 
         // Precondition:
         // - Operation count must not exceed MAX_OPERATIONS.
@@ -63,6 +53,18 @@ class MsgStream
         // - Message is appended to the stream; the message and operation counts are updated.
         void virtual appendMessage(const string& message);
         void virtual reset();
+        
+    public:
+        // Precondition:
+        // - Capacity must be between 1 and MAX_CAPACITY.
+        // Postcondition:
+        // - Capacity is initialized and the "messages" array is created.
+        MsgStream(int capacity);
+        MsgStream(const MsgStream& other);
+        MsgStream& operator=(const MsgStream& other);
+        MsgStream(MsgStream&& other) noexcept;
+        MsgStream& operator=(MsgStream&& other) noexcept;
+
         int getMessageCount() const;
         int getMaxOperations() const;
         int getCapacity() const;
