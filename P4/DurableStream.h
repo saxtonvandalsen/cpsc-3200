@@ -37,8 +37,8 @@ class DurableStream : public MsgStream
         DurableStream(DurableStream&& other) noexcept;
         DurableStream& operator=(DurableStream& other) noexcept;     
         void syncMessages();
-        void writeMessageToFile(const string& message);
-        bool isValidMessage(const string& message) const override;
+        void writeMessageToFile(unique_ptr<string[]> messages);
+        unique_ptr<string[]> getLastMessages(int count) const;
 
     public:
         DurableStream(int capacity, const string& filePath);
