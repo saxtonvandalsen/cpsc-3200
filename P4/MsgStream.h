@@ -32,7 +32,7 @@ class MsgStream
         int calculateMaxOperations(int capacity);
         bool isFull() const;
         bool operationLimit() const;
-        bool isValidMessage(const string& message) const;
+        bool virtual isValidMessage(const string& message) const;
         int calculateCapacity(int capacity);
         bool isInvalidRange(int startRange, int endRange) const;
 
@@ -53,7 +53,7 @@ class MsgStream
         // - The start and end ranges must be acceptable within the bounds of the message array.
         // Postcondition:
         // - Returns the messages between the specified start and end range.
-        unique_ptr<string[]> readMessages(int startRange, int endRange);
+        unique_ptr<string[]> virtual readMessages(int startRange, int endRange);
 
         // Precondition:
         // - Message stream must not be full.
@@ -61,8 +61,8 @@ class MsgStream
         // - The message must be non-null, non-empty, and within the MAX_STRING_LENGTH.
         // Postcondition:
         // - Message is appended to the stream; the message and operation counts are updated.
-        void appendMessage(const string& message);
-        void reset();
+        void virtual appendMessage(const string& message);
+        void virtual reset();
         int getMessageCount() const;
         int getMaxOperations() const;
         int getCapacity() const;
