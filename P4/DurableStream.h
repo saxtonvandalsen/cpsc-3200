@@ -20,6 +20,8 @@ class DurableStream : public MsgStream
     // - The capacity must be greater than 0, setting a limit on the number of messages stored in memory and on file.
     // - The WRITE_THRESHOLD determines the frequency of file writes to balance efficiency with data durability.
     // - The initialState accurately reflects the messages synced from the file, allowing reset operations to restore this state.
+    // - DurableStream extends reading to both in-memory messages and any that is maintained in the backing file.
+    // - Resetting will restore both in-memory and file messages to the original state of when the object was first created.
 
     private:
         const int WRITE_THRESHOLD = 3;
@@ -30,7 +32,6 @@ class DurableStream : public MsgStream
         unique_ptr<string[]> initialState;
         int capacity;
         int appendCounter;
-        bool disposed;
 
         DurableStream(const DurableStream& other);
         DurableStream& operator=(const DurableStream& other);
