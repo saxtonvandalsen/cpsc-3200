@@ -20,23 +20,35 @@ class MsgStream
     // - Clients must be prepared to handle exceptions, particularly those related to invalid message length and capacity limits, to ensure robust error handling.
 
     private:
-        static const int MAX_CAPACITY = 200;
-        const int MAX_STRING_LENGTH = 150;
-
-        unique_ptr<string[]> messages;
         int capacity;
         int maxOperations;
         int operationCount;
-        int messageCount;
 
         int calculateMaxOperations(int capacity);
         int calculateCapacity(int capacity);
         bool isInvalidRange(int startRange, int endRange) const;
 
     protected:
+        static const int MAX_CAPACITY = 200;
+        const int MAX_STRING_LENGTH = 150;
+
+        unique_ptr<string[]> messages;
+        int messageCount;
+
         bool virtual isFull() const;
         bool virtual operationLimit() const;
         bool virtual isValidMessage(const string& message) const;
+        
+    public:
+        // Precondition:
+        // - Capacity must be between 1 and MAX_CAPACITY.
+        // Postcondition:
+        // - Capacity is initialized and the "messages" array is created.
+        MsgStream(int capacity);
+        MsgStream(const MsgStream& other);
+        MsgStream& operator=(const MsgStream& other);
+        MsgStream(MsgStream&& other) noexcept;
+        MsgStream& operator=(MsgStream&& other) noexcept;
 
         // Precondition:
         // - Operation count must not exceed MAX_OPERATIONS.
@@ -53,18 +65,6 @@ class MsgStream
         // - Message is appended to the stream; the message and operation counts are updated.
         void virtual appendMessage(const string& message);
         void virtual reset();
-        
-    public:
-        // Precondition:
-        // - Capacity must be between 1 and MAX_CAPACITY.
-        // Postcondition:
-        // - Capacity is initialized and the "messages" array is created.
-        MsgStream(int capacity);
-        MsgStream(const MsgStream& other);
-        MsgStream& operator=(const MsgStream& other);
-        MsgStream(MsgStream&& other) noexcept;
-        MsgStream& operator=(MsgStream&& other) noexcept;
-
         int getMessageCount() const;
         int getMaxOperations() const;
         int getCapacity() const;
