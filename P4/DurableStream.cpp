@@ -31,6 +31,85 @@ DurableStream::DurableStream(int capacity, const string& filePath) : appendCount
     }
 }
 
+DurableStream::DurableStream(const DurableStream& other) : MsgStream(other)
+{
+    capacity = other.capacity;
+    appendCounter = other.appendCounter;
+    messageCount = other.messageCount;
+    filePath = other.filePath;
+
+    messages = make_unique<string[]>(capacity);
+    for (int i = 0; i < capacity; i++)
+    {
+        messages[i] = other.messages[i];
+    }
+
+    if (other.initialState)
+    {
+        initialState = make_unique<string[]>(capacity);
+        for (int i = 0; i < capacity; i++)
+        {
+            initialState[i] = other.initialState[i];
+        }
+    }
+}
+
+DurableStream& DurableStream::operator=(const DurableStream& other)
+{
+    if (this == &other) return *this;
+
+    MsgStream::operator=(other);
+
+    capacity = other.capacity;
+    appendCounter = other.appendCounter;
+    messageCount = other.messageCount;
+    filePath = other.filePath;
+
+    messages = make_unique<string[]>(capacity);
+    for (int i = 0; i < capacity; i++)
+    {
+        messages[i] = other.messages[i];
+    }
+
+    if (other.initialState)
+    {
+        initialState = make_unique<string[]>(capacity);
+        for (int i = 0; i < capacity; i++)
+        {
+            initialState[i] = other.initialState[i];
+        }
+    }
+
+    return *this;
+}
+
+DurableStream::DurableStream(DurableStream&& other) noexcept
+    : MsgStream(move(other)), capacity(0), appendCounter(0), filePath("") {
+    swap(messages, other.messages);
+    swap(initialState, other.initialState);
+    swap(appendCounter, other.appendCounter);
+    swap(filePath, other.filePath);
+}
+
+DurableStream& DurableStream::operator=(DurableStream&& other) noexcept
+{
+    if (this == &other) return *this;
+
+    MsgStream::operator=(move(other));
+
+    capacity = other.capacity;
+    appendCounter = other.appendCounter;
+    
+    messages = move(other.messages);
+    initialState = move(other.initialState);
+    filePath = move(other.filePath);
+
+    other.capacity = 0;
+    other.appendCounter = 0;
+
+    return * this;    
+}
+
 void DurableStream::appendMessage(const string& message)
 {
     if (isFull())
