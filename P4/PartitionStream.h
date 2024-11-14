@@ -43,9 +43,16 @@ class PartitionStream
         int getCapacity();
         int getPartitionCount();
         unique_ptr<int[]> getPartitionKeys();
+        void initializeMsgStream(int index, int capacity);
+        MsgStream& operator[](int index);
+        void operator-();
+        PartitionStream& operator+=(const PartitionStream& other);
 };
 
 // Implementation invariant:
-//
+// - 
+// - overloaded operator[] helps simplify access to MsgStream objects by index which improves abstraction.
+// - overloaded operator- provided a simple way to reset the state of PartitionStream without calling a separate function.
+// - overloaded operator+= allows for merging two PartitionStream objects in place.
 
 #endif

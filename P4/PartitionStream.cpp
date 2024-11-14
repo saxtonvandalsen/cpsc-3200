@@ -9,11 +9,12 @@
 
 using namespace std;
 
-PartitionStream::PartitionStream(int initialCapacity) : operationCount(0), partitionCount(0)
+PartitionStream::PartitionStream(int initialCapacity) : partitionCount(0), operationCount(0)
 {
     capacity = verifyCapacity(initialCapacity);
-    streams = make_unique<MsgStream[]>(capacity);
-    keys = make_unique<int[]>(capacity);
+
+    streams = std::unique_ptr<MsgStream[]>(new MsgStream[capacity]);
+    keys = std::unique_ptr<int[]>(new int[capacity]);
 
     for (int i = 0; i < capacity; i++)
     {
@@ -27,8 +28,8 @@ PartitionStream::PartitionStream(const PartitionStream& other)
     operationCount = other.operationCount;
     partitionCount = other.partitionCount;
 
-    streams = make_unique<MsgStream[]>(capacity);
-    keys = make_unique<int[]>(capacity);
+    streams = std::unique_ptr<MsgStream[]>(new MsgStream[capacity]);
+    keys = std::unique_ptr<int[]>(new int[capacity]);
 
     for (int i = 0; i < capacity; i++)
     {
@@ -41,8 +42,8 @@ PartitionStream& PartitionStream::operator=(const PartitionStream& other)
 {
     if (this == &other) return *this;
 
-    unique_ptr<MsgStream[]> copiedStreams = make_unique<MsgStream[]>(other.capacity);
-    unique_ptr<int[]> copiedKeys = make_unique<int[]>(other.capacity);
+    std::unique_ptr<MsgStream[]> copiedStreams(new MsgStream[other.capacity]);
+    std::unique_ptr<int[]> copiedKeys(new int[other.capacity]);
     
     for (int i = 0; i < other.capacity; i++)
     {
@@ -61,11 +62,11 @@ PartitionStream& PartitionStream::operator=(const PartitionStream& other)
 }
 
 PartitionStream::PartitionStream(PartitionStream&& other) noexcept
-    : capacity(other.capacity),
-      operationCount(other.operationCount),
+    : streams(std::move(other.streams)),
+      keys(std::move(other.keys)),
+      capacity(other.capacity),
       partitionCount(other.partitionCount),
-      streams(std::move(other.streams)),
-      keys(std::move(other.keys)) 
+      operationCount(other.operationCount)
 {
     other.capacity = 0;
     other.operationCount = 0;
@@ -179,10 +180,61 @@ int PartitionStream::getPartitionCount()
 
 unique_ptr<int[]> PartitionStream::getPartitionKeys()
 {
-    unique_ptr<int[]> copyKeys = make_unique<int[]>(capacity);
+    std::unique_ptr<int[]> copyKeys(new int[capacity]);
     for (int i = 0; i < capacity; i++)
     {
         copyKeys[i] = keys[i];
     }
     return copyKeys;
+}
+
+void PartitionStream::initializeMsgStream(int index, int capacity)
+{
+    if (index >= 0 && index < this->capacity)
+    {
+        streams[index] = MsgStream(capacity);
+    }
+    else
+    {
+        throw std::out_of_range("Invalid index for MsgStream initialization.");
+    }
+}
+
+MsgStream& PartitionStream::operator[](int index) {
+    
+    if (index < 0 || index >= capacity)
+    {
+        throw std::out_of_range("Invalid index");
+    }
+    return streams[index];
+}
+
+void PartitionStream::operator-() {
+    
+    partitionCount = 0;
+    operationCount = 0;
+
+    streams = std::unique_ptr<MsgStream[]>(new MsgStream[capacity]);
+    keys = std::unique_ptr<int[]>(new int[capacity]);
+
+    for (int i = 0; i < capacity; i++)
+    {
+        keys[i] = i + 1;
+    }
+}
+
+PartitionStream& PartitionStream::operator+=(const PartitionStream& other) {
+    
+    if (capacity != other.capacity)
+    {
+        throw std::invalid_argument("PartitionStreams must have the same capacity to merge");
+    }
+
+    for (int i = 0; i < other.capacity; i++)
+    {
+        streams[i] += other.streams[i];
+    }
+    partitionCount += other.partitionCount;
+    operationCount += other.operationCount;
+    return *this;
 }
