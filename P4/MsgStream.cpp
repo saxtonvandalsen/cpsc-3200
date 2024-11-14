@@ -8,12 +8,14 @@
 
 using namespace std;
 
-MsgStream::MsgStream(int initialCapacity) : messageCount(0), operationCount(0)
+MsgStream::MsgStream(int initialCapacity) : operationCount(0), messageCount(0)
 {
     capacity = calculateCapacity(initialCapacity);
     maxOperations = calculateMaxOperations(initialCapacity);
-    messages = make_unique<string[]>(capacity);
+    messages = std::unique_ptr<std::string[]>(new std::string[capacity]);
 }
+
+MsgStream::MsgStream() : capacity(0), maxOperations(0), operationCount(0), messages(nullptr), messageCount(0) {}
 
 MsgStream::MsgStream(const MsgStream& other)
 {
@@ -22,7 +24,7 @@ MsgStream::MsgStream(const MsgStream& other)
     messageCount = other.messageCount;
     operationCount = other.operationCount;
 
-    messages = make_unique<string[]>(capacity);
+    messages = std::unique_ptr<std::string[]>(new std::string[capacity]);
 
     for (int i = 0; i < capacity; i++)
     {
@@ -34,7 +36,7 @@ MsgStream& MsgStream::operator=(const MsgStream& other)
 {
     if (this == &other) return *this;
 
-    unique_ptr<string[]> newMessages = make_unique<string[]>(other.capacity);
+    std::unique_ptr<std::string[]> newMessages(new std::string[other.capacity]);
 
     for (int i = 0; i < other.messageCount; i++)
     {
@@ -52,7 +54,7 @@ MsgStream& MsgStream::operator=(const MsgStream& other)
 }
 
 MsgStream::MsgStream(MsgStream&& other) noexcept
-    : messages(nullptr), capacity(0), maxOperations(0), messageCount(0), operationCount(0) {
+    : capacity(0), maxOperations(0), operationCount(0), messages(nullptr), messageCount(0) {
         swap(messages, other.messages);
         swap(capacity, other.capacity);
         swap(maxOperations, other.maxOperations);
@@ -87,7 +89,7 @@ unique_ptr<string[]> MsgStream::readMessages(int startRange, int endRange)
         throw out_of_range("Invalid range for reading messages.");
 
     int range = endRange - startRange + 1;
-    unique_ptr<string[]> readMessages = make_unique<string[]>(range);
+    std::unique_ptr<std::string[]> readMessages(new std::string[range]);
 
     for (int i = 0; i < range; i++)
     {
@@ -157,6 +159,58 @@ void MsgStream::reset()
     operationCount = 0;
 
     messages = make_unique<string[]>(capacity);
+}
+
+bool MsgStream::operator!() const {
+    return messageCount == 0;
+}
+
+MsgStream MsgStream::operator+(const MsgStream& other) const {
+    
+    MsgStream merged(capacity + other.capacity);
+    for (int i = 0; i < messageCount; i++)
+    {
+        merged.appendMessage(messages[i]);
+    }
+    for (int i = 0; i < other.messageCount; i++) {
+        merged.appendMessage(other.messages[i]);
+    }
+    return merged;
+}
+
+bool MsgStream::operator==(const MsgStream& other) const {
+    
+    if (messageCount != other.messageCount || capacity != other.capacity)
+    {
+        return false;
+    }
+    for (int i = 0; i < messageCount; i++)
+    {
+        if (messages[i] != other.messages[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool MsgStream::operator!=(const MsgStream& other) const {
+    return !(*this == other);
+}
+
+MsgStream& MsgStream::operator+=(const MsgStream& other) {
+    
+    if (messageCount + other.messageCount > capacity)
+    {
+        throw std::runtime_error("Combined MsgStream exceeds capacity");
+    }
+
+    for (int i = 0; i < other.messageCount; i++)
+    {
+        appendMessage(other.messages[i]);
+    }
+
+    return *this;
 }
 
 int MsgStream::getMessageCount() const
