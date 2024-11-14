@@ -45,6 +45,10 @@ class MsgStream
         // Postconditions:
         // - Capacity is initialized and the "messages" array is created.
         MsgStream(int capacity);
+
+        // Postcondition:
+        // - MsgStream object created with all variables set to 0 and nullptr.
+        MsgStream();
         
         // Preconditions:
         // - passed in object must be valid and initialized.
@@ -99,6 +103,21 @@ class MsgStream
         // - All messages in MsgStream are cleared and replaced with an empty array.
         // - message count and operation count are reset to 0.
         void virtual reset();
+        
+        //
+        bool operator!() const ;
+
+        //
+        MsgStream operator+(const MsgStream& other) const;
+
+        //
+        bool operator==(const MsgStream& other) const;
+
+        // 
+        bool operator!=(const MsgStream& other) const;
+
+        //
+        MsgStream& operator+=(const MsgStream& other);
 
         int getMessageCount() const;
         int getMaxOperations() const;
@@ -111,5 +130,10 @@ class MsgStream
 // - Messages are stored sequentially in the messages array without any gaps or uninitialized entries within the valid range.
 // - The capacity must not be exceeded; attempting to append beyond capacity should throw an appropriate error.
 // - The operation count must accurately reflect the total number of client operations performed on the stream.
+// - overloaded operator! provides a quick way to check if the stream is empty, improving readability.
+// - overloaded operator+ allows merging two stream into a new stream for clear abstraction.
+// - overloaded operator== enables comparison of two streams to enhance usability for equality checks.
+// - overloaded operator!= enables comparison of two stream but returns the negation of ==.
+// - overloaded operator+= helps in combining messages of two objects into one.
 
 #endif
