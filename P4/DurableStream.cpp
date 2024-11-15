@@ -8,11 +8,17 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
+#include <iostream>
 
 using namespace std;
 
 DurableStream::DurableStream(int capacity, const string& filePath) : MsgStream(capacity), appendCounter(0)
 {
+    if (!isValidFilePath(filePath)) 
+    {
+        throw invalid_argument("Invalid file path.");
+    }
+
     ifstream inFile(filePath);
     if (inFile.is_open())
     {
@@ -39,18 +45,21 @@ DurableStream::DurableStream(const DurableStream& other) : MsgStream(other)
     filePath = other.filePath;
 
     messages = std::unique_ptr<std::string[]>(new std::string[capacity]);
-    for (int i = 0; i < capacity; i++)
+    for (int i = 0; i < messageCount && i < capacity; i++)
     {
         messages[i] = other.messages[i];
     }
 
-    if (other.initialState)
-    {
+    if (other.initialState) {
         initialState = std::unique_ptr<std::string[]>(new std::string[capacity]);
-        for (int i = 0; i < capacity; i++)
+        for (int i = 0; i < messageCount && i < capacity; i++)
         {
             initialState[i] = other.initialState[i];
         }
+    } 
+    else
+    {
+        initialState = nullptr;
     }
 }
 
@@ -66,7 +75,7 @@ DurableStream& DurableStream::operator=(const DurableStream& other)
     filePath = other.filePath;
 
     messages = std::unique_ptr<std::string[]>(new std::string[capacity]);
-    for (int i = 0; i < capacity; i++)
+    for (int i = 0; i < messageCount; i++)
     {
         messages[i] = other.messages[i];
     }
@@ -74,10 +83,13 @@ DurableStream& DurableStream::operator=(const DurableStream& other)
     if (other.initialState)
     {
         initialState = std::unique_ptr<std::string[]>(new std::string[capacity]);
-        for (int i = 0; i < capacity; i++)
+        for (int i = 0; i < messageCount; i++)
         {
             initialState[i] = other.initialState[i];
         }
+    } else
+    {
+        initialState = nullptr;
     }
 
     return *this;
@@ -141,18 +153,15 @@ unique_ptr<string[]> DurableStream::readMessages(int startRange, int endRange)
 
 void DurableStream::reset()
 {
-    // step 1: clear in-memory messages
     messages = std::unique_ptr<std::string[]>(new std::string[capacity]);
     messageCount = 0;
 
-    //step 2: reload messages from initialState
     for (int i = 0; i < capacity && !initialState[i].empty(); i++)
     {
         messages[i] = initialState[i];
         messageCount++;
     }
 
-    // step 3: clear and rewrite the file
     ofstream outFile(filePath, ios::trunc); // truncate to clear file
     if (outFile.is_open())
     {
@@ -204,4 +213,13 @@ unique_ptr<string[]> DurableStream::getLastMessages(int count) const
         messages[i] = this->messages[startIndex + i];
     }
     return messages;
+}
+
+bool DurableStream::isValidFilePath(const string& file) const
+{
+    if (file.empty())
+    {  
+        return false;
+    }
+    return true;
 }
