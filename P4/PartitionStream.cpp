@@ -9,11 +9,10 @@
 
 using namespace std;
 
-PartitionStream::PartitionStream(int initialCapacity) : partitionCount(0), operationCount(0)
+PartitionStream::PartitionStream(int initialCapacity, std::unique_ptr<MsgStream[]> msgStreams)
+    : streams(move(msgStreams)), partitionCount(0), operationCount(0)
 {
     capacity = verifyCapacity(initialCapacity);
-
-    streams = std::unique_ptr<MsgStream[]>(new MsgStream[capacity]);
     keys = std::unique_ptr<int[]>(new int[capacity]);
 
     for (int i = 0; i < capacity; i++)
@@ -196,7 +195,7 @@ void PartitionStream::initializeMsgStream(int index, int capacity)
     }
     else
     {
-        throw std::out_of_range("Invalid index for MsgStream initialization.");
+        throw out_of_range("Invalid index for MsgStream initialization.");
     }
 }
 
@@ -204,7 +203,7 @@ MsgStream& PartitionStream::operator[](int index) {
     
     if (index < 0 || index >= capacity)
     {
-        throw std::out_of_range("Invalid index");
+        throw out_of_range("Invalid index");
     }
     return streams[index];
 }
@@ -227,7 +226,7 @@ PartitionStream& PartitionStream::operator+=(const PartitionStream& other) {
     
     if (capacity != other.capacity)
     {
-        throw std::invalid_argument("PartitionStreams must have the same capacity to merge");
+        throw invalid_argument("PartitionStreams must have the same capacity to merge");
     }
 
     for (int i = 0; i < other.capacity; i++)
