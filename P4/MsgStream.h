@@ -104,19 +104,39 @@ class MsgStream
         // - message count and operation count are reset to 0.
         void virtual reset();
         
-        //
+        // Preconditions:
+        // - MsgStream object is valid and initialized.
+        // Postconditions:
+        // - will return true if the MsgStream is empty (messageCount == 0), otherwise false.
         bool operator!() const ;
 
-        //
+        // Preconditions:
+        // - Both MsgStream objects are valid and initialized.
+        // - The total combined capacity of the two MsgStreams does not exceed the maximum allowable size.
+        // Postconditions:
+        // - Returns a new MsgStream object containing all messages from both MsgStreams.
+        // - The original MsgStream objects remain unchanged.
         MsgStream operator+(const MsgStream& other) const;
 
-        //
+        // Preconditions:
+        // - Both MsgStream objects are valid and initialized.
+        // - The capacity and message counts of both MsgStreams are accurately set.
+        // Postconditions:
+        // - Returns true if the two MsgStreams are identical in capacity, message count, and content; otherwise false.
         bool operator==(const MsgStream& other) const;
 
-        // 
+        // Preconditions:
+        // - Both MsgStream objects are valid and initialized.
+        // Postconditions:
+        // - Returns true if the two MsgStreams are not equal; otherwise false.
         bool operator!=(const MsgStream& other) const;
 
-        //
+        // Preconditions:
+        // - Both MsgStream objects are valid and initialized.
+        // - The total combined message count does not exceed the capacity of the current MsgStream.
+        // Postconditions:
+        // - Appends all messages from the other MsgStream to the current MsgStream.
+        // - Throws a runtime error if the combined message count exceeds the capacity.
         MsgStream& operator+=(const MsgStream& other);
 
         int getMessageCount() const;
