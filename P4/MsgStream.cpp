@@ -26,7 +26,7 @@ MsgStream::MsgStream(const MsgStream& other)
 
     messages = std::unique_ptr<std::string[]>(new std::string[capacity]);
 
-    for (int i = 0; i < capacity; i++)
+    for (int i = 0; i < messageCount; i++)
     {
         messages[i] = other.messages[i];
     }
