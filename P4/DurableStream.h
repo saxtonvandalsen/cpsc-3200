@@ -80,6 +80,7 @@ class DurableStream : public MsgStream
         // - The messagess are appeneded to the file.
         void writeMessageToFile(unique_ptr<string[]> messages);
         unique_ptr<string[]> getLastMessages(int count) const;
+        bool isValidFilePath(const string& file) const;
 
     public:
         // Preconditions:
