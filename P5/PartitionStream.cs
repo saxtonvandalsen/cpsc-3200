@@ -5,8 +5,9 @@ using MsgStreamLibrary;
 using System;
 using Systems.Collections.Generic;
 using System.Linq;
+using System.ComponentModel;
 
-namespace PartitionStreamLibrary
+namespace PartitionStreamLibrary : IDisposable
 {
     // Class invariant:
     // PartitionStream must maintain a non-null Dictionary of MsgStream objects

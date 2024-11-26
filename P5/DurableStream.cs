@@ -5,10 +5,11 @@ using System;
 using Systems.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.ComponentModel;
 
 namespace DurableStreamLibrary
 {
-    public class DurableStream : MsgStream
+    public class DurableStream : MsgStream, IDisposable
     {
         // Class invariant:
         // Client must know this class is based on MsgStream and extends its functionality to include file I/O, ensuring 
