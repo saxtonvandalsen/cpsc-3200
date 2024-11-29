@@ -12,7 +12,7 @@ namespace SubscriberStreamLibrary
     public class SubscriberStream
     {
         private PartitionStream partitionStream;
-        private List<ISubsrciber> subscribers;
+        private List<ISubscriber> subscribers;
         private int capacity;
         private int messageCount;
 
@@ -31,24 +31,28 @@ namespace SubscriberStreamLibrary
             return true;
         }
 
-        public SubscriberStream (PartitionStream partitionStream, List<ISubscriber> subscribers, int capacity)
+        private bool IsValidMessage(string message)
         {
-            if (partitionStream == null) throw new ArgumentNullException(nameof(partitionStream));
+            return message != null && message.Trim() != "";
+        }
+
+        public SubscriberStream (IEnumerable<MsgStreams> streams, List<ISubscriber> subscribers, int capacity)
+            : base(streams, capacity)
+        {
             if (subscribers == null) throw new ArgumentNullException(nameof(subscribers));
 
             messageCount = 0;
             ValidateCapacity(capacity);
             this.capacity = capacity;
-            this.partitionStream = partitionStream;
             this.subscribers = subscribers ?? new List<ISubscriber>();
         }
 
-        public void addMessage(int key, string message)
+        public void AddNewMessage(int key, string message)
         {
             if (!partitionStream.GetPartitionKeys().Contains(partitionKey))
                 throw new ArgumentException("Invalid partition key.");
 
-            if (!partitionStream.IsValidMessage(message))
+            if (!IsValidMessage(message))
                 throw new ArgumentException("Invalid message.");
             
             partitionStream.addMessage(key, message);
@@ -56,18 +60,18 @@ namespace SubscriberStreamLibrary
 
             foreach (var sub in subscribers)
             {
-                subscribers.NewMessage(message);
+                sub.NewMessage(message);
             }
         }
 
-        public void addSubscriber(ISubscriber newSub)
+        public void AddSubscriber(ISubscriber newSub)
         {
             if (newSub == null) throw new ArgumentNullException(nameof(newSub));
 
             subscribers.Add(newSub);
         }
 
-        public void removeSubscriber(ISubscriber removeSub)
+        public void RemoveSubscriber(ISubscriber removeSub)
         {
             if (removeSub == null) throw new ArgumentNullException(nameof(removeSub));
 
