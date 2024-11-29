@@ -149,7 +149,7 @@ namespace PartitionStreamLibrary : IDisposable
 
             if (OperationLimitReached()) throw new InvalidOperationException("Operation limit has been reached ");
 
-            operationCount++:
+            operationCount++;
 
             return msgStreams[partitionKey].ReadMessages(startRange, endRange);
         }
