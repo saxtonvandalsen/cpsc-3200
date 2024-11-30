@@ -137,17 +137,46 @@ namespace DurableStreamLibrary
         }
 
         // Preconditions:
-        // - The streams must be open and initialized
+        // - Dispose() method must be called when the object is no longer needed
+        // - instance must have initialized resources fileStream and bufferedStream
         // Postconditions:
-        // - The buffered stream and file stream are closed, releasing any resources
+        // - Managed resources bufferedStream and fileStream are properly closed
+        // - object is marked as disposed
         public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        // Preconditions:
+        // - Should only be called by Dispose() or the finalizer
+        // - disposing is true when called from Dispose(), false when called from the finalizer
+        // Postconditions:
+        // - If disposing is true, managed resources are released
+        // - Regardless of disposing, the object is marked as disposed
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
             {
-                bufferedStream.Close();
-                fileStream.Close();
-            }    
-            disposed = true;
+                if (disposing)
+                {
+                    bufferedStream?.Close();
+                    fileStream?.Close();
+                }
+                
+                disposed = true;
+            }
+        }
+        
+        // Preconditions:
+        // - The object must not have been disposed already
+        // Postconditions:
+        // - Dispose(bool) is called with disposing set to false; unmanaged resources are cleaned up
+        // - GC.SuppressFinalize() is not called
+        ~DurableStream()
+        {
+            Dispose(false);
         }
 
         // Preconditions:
