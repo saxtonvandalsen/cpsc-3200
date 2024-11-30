@@ -2,7 +2,7 @@
 // 12/3/2024
 
 
-using ISubscriberInterface
+namespace ISubscriberInterface
 {
     public interface ISubscriber
     {
