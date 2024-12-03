@@ -66,19 +66,26 @@ namespace SubscriberStreamLibrary
                 throw new ArgumentException("Invalid message.");
             
             partitionStream.AddMessage(key, message);
-            messageCount++;
+
+            if (subscribers.Count > 0)
+                subscribers[0].NewMessageAlert();
 
             foreach (var sub in subscribers)
             {
                 sub.NewMessage(message);
             }
+
+            messageCount++;
         }
 
         public void AddSubscriber(ISubscriber newSub)
         {
             if (newSub == null) throw new ArgumentNullException(nameof(newSub));
 
-            subscribers.Add(newSub);
+            if (!subscribers.Contains(newSub))
+            {
+                subscribers.Add(newSub);
+            }
         }
 
         public void RemoveSubscriber(ISubscriber removeSub)
@@ -87,6 +94,12 @@ namespace SubscriberStreamLibrary
 
             subscribers.Remove(removeSub);
         }
+
+        public int GetSubscribers()
+        {
+            return subscribers.Count;
+        }
+
         // Implementation invariant:
         // - The SubscriberStream class relies on the PartitionStream to manage partitioned messages 
         //   and assumes it maintains its own invariants, such as valid keys and message integrity
