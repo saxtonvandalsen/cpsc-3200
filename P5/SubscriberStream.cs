@@ -47,6 +47,7 @@ namespace SubscriberStreamLibrary
         }
 
         public SubscriberStream (IEnumerable<MsgStream> streams, List<ISubscriber> subscribers, int capacity)
+            : base(streams, capacity)
         {
             if (subscribers == null) throw new ArgumentNullException(nameof(subscribers));
 
