@@ -14,6 +14,7 @@ namespace PartitionStreamLibrary : IDisposable
     // Number of MsgStreams (partition count) should not exceed the specified capacity
     // Each MsgStream in msgStreams must be valid by MsgStream class, initialized, and have a unique integer key
     // Capacity must be between 1 and MAX_CAPACITY (200)
+    // PartitionStream instance must not be used after it has been disposed.
     public class PartitionStream
     {
 
@@ -122,6 +123,8 @@ namespace PartitionStreamLibrary : IDisposable
         // - Adds message to specified MsgStream based on key, if within capacity and operation limit
         public void AddMessage(int partitionKey, string message)
         {
+            CheckDisposed();
+
             if (!ValidatePartitionKey(partitionKey)) throw new ArgumentException("Invalid partition key.");
 
             if (IsFull()) throw new InvalidOperationException("Partition stream is full");
@@ -191,6 +194,65 @@ namespace PartitionStreamLibrary : IDisposable
             return deepCopyStream;
         }
 
+        // Preconditions:
+        // - PartitionStream object must be properly initialized and may contain allocated resources.
+        // Postconditions:
+        // - Calls Dispose(bool) with disposing set to true to release both managed and unmanaged resources.
+        // - Suppresses finalization to prevent the finalizer from being called redundantly.
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        
+        // Preconditions:
+        // - disposing is true when called from Dispose(), false when called from the finalizer.
+        // - PartitionStream object must not already be disposed.
+        // Postconditions:
+        // - Releases managed resources if disposing is true.
+        // - Marks object as disposed
+        private void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    foreach (var stream in msgStreams.Values)
+                    {
+                        if (stream is IDisposable disposableStream)
+                        {
+                            disposableStream.Dispose();
+                        }
+                    }
+                }
+                
+                disposed = true;
+            }
+        }
+        
+        // Preconditions:
+        // - PartitionStream object must not have already been disposed by the Dispose() method.
+        // Postconditions:
+        // - Ensures unmanaged resources are cleaned up if Dispose() was not called.
+        // - Calls Dispose(false) to clean up unmanaged resources and suppresses managed cleanup.
+        ~PartitionStream()
+        {
+            Dispose(false);
+        }
+        
+        // Preconditions:
+        // - method is called internally by public methods to ensure the object is in a valid state.
+        // Postconditions:
+        // - Throws an exception if object has already been disposed.
+        // - Allows the calling method to proceed if the object is not disposed.
+        private void CheckDisposed()
+        {
+            if (disposed)
+            {
+                throw new ObjectDisposedException("PartitionStream");
+            }
+        }
+
         public int GetPartitionCount()
         {
             return partitionCount;
@@ -211,4 +273,5 @@ namespace PartitionStreamLibrary : IDisposable
     // Each MsgStream in msgStreams should be initialized and should be functionable with its methods
     // Operation limit for each MsgStream should be respected by OperationLimitReached from PartitionStream
     // All methods that modify or access msgStreams should validate the partition key associated
+    // The Dispose() method must properly release all managed resources and mark the instance as disposed.
 }
