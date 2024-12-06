@@ -26,6 +26,11 @@ namespace SubscriberStreamLibrary
         private int capacity;
         private int messageCount;
 
+        // Preconditions:
+        // - Capacity must be valid
+        // Postconditions:
+        // - Returns true if capacity is valid and within the range of 1 to 200.
+        // - Throws an exception if capacity exceeds 200 or is less than or equal to 0, setting it to the nearest valid value.
         private bool ValidateCapacity(int capacity)
         {
             if (capacity > 200)
@@ -46,6 +51,13 @@ namespace SubscriberStreamLibrary
             return message != null && message.Trim() != "";
         }
 
+        // Preconditions:
+        // - Streams collection must be non-null and properly initialized.
+        // - Subscribers list must be non-null.
+        // - Capacity must be within the range of 1 to 200.
+        // Postconditions:
+        // - Initializes the SubscriberStream instance with a valid PartitionStream, subscribers list, and capacity.
+        // - Throws exceptions for invalid input values.
         public SubscriberStream (IEnumerable<MsgStream> streams, List<ISubscriber> subscribers, int capacity)
             : base(streams, capacity)
         {
@@ -79,6 +91,13 @@ namespace SubscriberStreamLibrary
             messageCount++;
         }
 
+        // Preconditions:
+        // - Key must exist in the partition keys of the partitionStream.
+        // - Message must be valid (non-null and non-empty).
+        // Postconditions:
+        // - Adds the message to the appropriate partition in the partitionStream.
+        // - Notifies subscribers by calling their NewMessage method.
+        // - Increments the message count.
         public void AddSubscriber(ISubscriber newSub)
         {
             if (newSub == null) throw new ArgumentNullException(nameof(newSub));
@@ -89,6 +108,10 @@ namespace SubscriberStreamLibrary
             }
         }
 
+        // Preconditions:
+        // - RemoveSub must implement the ISubscriber interface and be non-null.
+        // Postconditions:
+        // - Removes the specified subscriber from the subscribers list if it exists.
         public void RemoveSubscriber(ISubscriber removeSub)
         {
             if (removeSub == null) throw new ArgumentNullException(nameof(removeSub));
